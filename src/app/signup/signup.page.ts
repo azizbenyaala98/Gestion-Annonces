@@ -5,11 +5,12 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
 })
-export class SignupPage implements OnInit {
+export class SignupPage {
 
   constructor() { }
 
-  ngOnInit() {
-  }
+  submitForm() {
+    // Add your form submission logic here
+    console.log('Form submitted!');
 
-}
+}}
