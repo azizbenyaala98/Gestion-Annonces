@@ -39,7 +39,7 @@ export class LoginPage implements OnInit {
       return this.loginForm?.controls;
     }
   
-    async login(){
+    /*async login(){
       const loading =await this.loadingCtrl.create();
       await loading.present();
       if (this.loginForm?.valid){
@@ -50,7 +50,8 @@ export class LoginPage implements OnInit {
           })
           if(user){
             loading.dismiss()
-            this.router.navigate(['/shop']);
+            this.router.navigate(['/user-dashboard/']);
+            console.log(this.authService.getProfile)
   
           }
           else{
@@ -59,8 +60,41 @@ export class LoginPage implements OnInit {
   
       }
   
+    }*/
+    async login() {
+      const loading = await this.loadingCtrl.create();
+      await loading.present();
+    
+      if (this.loginForm?.valid) {
+        try {
+          const user = await this.authService.loginUser(
+            this.loginForm.value.email, this.loginForm.value.password
+          );
+    
+          if (user) {
+            loading.dismiss();
+    
+            // Use authService.getProfile to get user information
+            const userProfile = await this.authService.getProfile();
+    
+            console.log('User Profile:', userProfile);
+    
+            // Navigate to user dashboard with user ID
+            if (userProfile?.uid) {
+              this.router.navigate(['/user-dashboard', userProfile.uid]);
+            } else {
+              console.error('User profile is missing the UID.');
+            }
+          } else {
+            console.log('Provide correct values');
+          }
+        } catch (error) {
+          console.error('An error occurred during login:', error);
+          loading.dismiss();
+        }
+      }
     }
-  
+    
   
 
 }
