@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 @Component({
   selector: 'app-login',
@@ -10,11 +10,20 @@ import { AuthService } from '../auth.service';
 })
 export class LoginPage implements OnInit {
   loginForm:FormGroup
+
   
   constructor(public formBuilder : FormBuilder,
     public loadingCtrl:LoadingController,
     public authService:AuthService,
-    public router :Router) { }
+    private   alertController: AlertController,
+    public router :Router) 
+    { }
+    get email(){
+      return this.loginForm.get('email')
+    }
+    get password(){
+      return this.loginForm.get('password')
+    }
 
   
     ngOnInit() {
@@ -39,60 +48,25 @@ export class LoginPage implements OnInit {
       return this.loginForm?.controls;
     }
   
-    /*async login(){
+    async showAlert(header,message){
+      const alert =await this.alertController.create({
+        header,
+        message,
+        buttons:['ok'],
+      });
+      await alert.present();
+    }
+    async login() {
       const loading =await this.loadingCtrl.create();
       await loading.present();
-      if (this.loginForm?.valid){
-        const user = await this.authService.loginUser(
-          this.loginForm.value.email,this.loginForm.value.password).catch((error)=>{
-            console.log(error);
-            loading.dismiss()
-          })
-          if(user){
-            loading.dismiss()
-            this.router.navigate(['/user-dashboard/']);
-            console.log(this.authService.getProfile)
+      const user =await this.authService.login(this.loginForm.value)
+      await loading.dismiss();
   
-          }
-          else{
-            console.log("provide correct values")
-          }
+      if (user){this.router.navigateByUrl('/user-dashboard',{replaceUrl:true})
   
-      }
+      }else
+      this.showAlert('login failed ','plz try again')
   
-    }*/
-    async login() {
-      const loading = await this.loadingCtrl.create();
-      await loading.present();
-    
-      if (this.loginForm?.valid) {
-        try {
-          const user = await this.authService.loginUser(
-            this.loginForm.value.email, this.loginForm.value.password
-          );
-    
-          if (user) {
-            loading.dismiss();
-    
-            // Use authService.getProfile to get user information
-            const userProfile = await this.authService.getProfile();
-    
-            console.log('User Profile:', userProfile);
-    
-            // Navigate to user dashboard with user ID
-            if (userProfile?.uid) {
-              this.router.navigate(['/user-dashboard', userProfile.uid]);
-            } else {
-              console.error('User profile is missing the UID.');
-            }
-          } else {
-            console.log('Provide correct values');
-          }
-        } catch (error) {
-          console.error('An error occurred during login:', error);
-          loading.dismiss();
-        }
-      }
     }
     
   

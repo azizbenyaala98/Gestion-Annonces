@@ -1,13 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>userDashboard</ion-title>
+    <ion-title>welcome {{activeUser}}</ion-title>
+   <ion-button (click)="logout()"> logout</ion-button>
+   
+    <ion-button (click)="ToAddProduct()"> add product</ion-button>
+    
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">{{currentUser}}</ion-title>
+      <ion-title size="large"></ion-title>
     </ion-toolbar>
   </ion-header>
+
 </ion-content>

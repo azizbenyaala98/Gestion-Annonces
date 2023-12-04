@@ -1,5 +1,10 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import {redirectUnauthorizedTo,redirectLoggedInTo,canActivate} from '@angular/fire/auth-guard'
+import { AddProductPageModule } from './add-product/add-product.module';
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToDash=()=>redirectLoggedInTo(['user-dashboard'])
+
 
 const routes: Routes = [
   {
@@ -13,28 +18,32 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule),
+    
   },
   {
     path: 'signup',
     loadChildren: () => import('./signup/signup.module').then( m => m.SignupPageModule)
   },
-  {
-    path: 'reset-password',
-    loadChildren: () => import('./reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
-  },
+
   {
     path: 'shop',
     loadChildren: () => import('./shop/shop.module').then( m => m.ShopPageModule)
   },
+  
   {
-    path: 'add-product-page',
-    loadChildren: () => import('./add-product-page/add-product-page.module').then( m => m.AddProductPagePageModule)
+    path: 'user-dashboard',
+    loadChildren: () => import('./user-dashboard/user-dashboard.module').then(m => m.UserDashboardPageModule),
+    
+    ...canActivate(redirectUnauthorizedToLogin)
+
+    
   },
   {
-    path: 'user-dashboard/:id',
-    loadChildren: () => import('./user-dashboard/user-dashboard.module').then( m => m.UserDashboardPageModule)
+    path: 'user-dashboard/add-product',
+    loadChildren: () => import('./add-product/add-product.module').then( m => m.AddProductPageModule)
   },
+ 
 ];
 
 @NgModule({

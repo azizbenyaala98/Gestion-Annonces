@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -15,12 +15,10 @@ export class SignupPage implements OnInit {
   constructor(public formBuilder : FormBuilder,
     public loadingCtrl:LoadingController,
     public authService:AuthService,
-    public router:Router  ) { }
+    public router:Router ,
+    private alertController :AlertController ) { }
 
-  submitForm() {
-    // Add your form submission logic here
-    console.log('Form submitted!');
-  }
+
   ngOnInit() {
     this.regForm=this.formBuilder.group({
       fullname:['',Validators.required],
@@ -38,31 +36,25 @@ export class SignupPage implements OnInit {
 
       
   }
-  get  ErrorControl(){
 
-    return this.regForm?.controls;
+  async showAlert(header,message){
+    const alert =await this.alertController.create({
+      header,
+      message,
+      buttons:['ok'],
+    });
+    await alert.present();
   }
 
   async signUp(){
     const loading =await this.loadingCtrl.create();
     await loading.present();
-    if (this.regForm?.valid){
-      const user = await this.authService.registeruser(
-        this.regForm.value.email,this.regForm.value.password).catch((error)=>{
-          console.log(error);
-          loading.dismiss()
-        })
-        if(user){
-          loading.dismiss()
-          this.router.navigate(['/login']);
+    const user =await this.authService.registeruser(this.regForm.value)
+    await loading.dismiss();
 
-        }
-        else{
-          console.log("provide correct values")
-        }
+    if (user){this.router.navigateByUrl('/login',{replaceUrl:true})
 
-    }
+    }else
+    this.showAlert('registaration failed ','plz try again')
 
-  }
-
-}
+}}

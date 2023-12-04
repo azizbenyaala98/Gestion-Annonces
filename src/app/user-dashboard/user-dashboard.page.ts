@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FirebaseApp } from '@angular/fire/app';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { User } from '../models/user.model';
+import { Product } from '../models/product.model';
+import { ProductService } from '../product.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -10,30 +10,27 @@ import { User } from '../models/user.model';
   styleUrls: ['./user-dashboard.page.scss'],
 })
 export class UserDashboardPage implements OnInit {
-  currentUser: string =''
+  activeUser:string;
   userId: string;
 
-  constructor(public authService : AuthService,
-    private route: ActivatedRoute) { }
-  
+
+  constructor(private auth:AuthService,
+    private router :Router,
+    private route: ActivatedRoute
+    ){}
   ngOnInit() {
+    console.log("user dashboard launched")
     this.userId = this.route.snapshot.paramMap.get('id');
     console.log('User ID:', this.userId);
-
-
-
-    this.authService.getCurrentUser()
-      .then((user) => {
-        this.currentUser = this.sub(user.email);
-        console.log('Current User:', this.currentUser);
-      })
-      .catch((error) => {
-        console.error('Error getting current user:', error);
-      });
-  
+    const currentUser=this.sub(this.auth.currentUser().email)
+    this.activeUser=currentUser
+    console.log(currentUser)
 }
-
- sub(input: string): string {
+logout(){
+  this.auth.signout()
+  this.router.navigateByUrl('/login')
+}
+sub(input: string): string {
   const atIndex = input.indexOf('@');
 
   if (atIndex !== -1) {
@@ -42,5 +39,10 @@ export class UserDashboardPage implements OnInit {
 
   // If "@" is not found, return the original string or handle it as needed
   return input;
+}
+
+ToAddProduct(){
+  console.log("ready to add product")
+  this.router.navigate(['/user-dashboard/add-product'])
 }
 }
